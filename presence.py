@@ -88,11 +88,8 @@ def toHash(l):
 lastActivated = None
 
 def sendWithAlias(m,host, state):
-   
-
    if m in aliases:
       host = aliases[m]
-
    client2.publish(PRESENCE + "/" + host, str(state), qos=1)
 
 reconnect = 100
@@ -115,6 +112,7 @@ while True:
           for k in old:
              if not (k in lastActivated):
                 sendWithAlias(k, old[k],0)
+       client2.publish(PRESENCE + "/WATCHDOG", 1) 
 
    except Exception:
        traceback.print_exc()
