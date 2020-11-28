@@ -76,7 +76,8 @@ while True:
 
     # query the box
         for i in ['0','1']: 
-            ap = f.com("wifi/ap/" + i + "/stations")['result']
+            response = f.com("wifi/ap/" + i + "/stations") 
+            ap = response['result']
 
             result = map(lambda x:(x['mac'],x['hostname'],x["signal"],x["rx_bytes"],x["tx_bytes"]), ap)
             for (mac,hostname,signal,rx,tx) in result:
