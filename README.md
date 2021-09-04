@@ -2,6 +2,11 @@
 
 # Python Mqtt agent, publishing freebox connection informations
 
+This permit to :
+- Make integrity checks on connected devices / stations
+- Measures the network activity for childrens, and raise alarms
+- Be aware of people in the location of the Wifi State (presence) 
+
 ## prerequisis
 
 - mqtt-paho library
