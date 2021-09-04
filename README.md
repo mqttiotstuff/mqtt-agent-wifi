@@ -1,5 +1,21 @@
 
 
+# Python Mqtt agent, publishing freebox connection informations
+
+## prerequisis
+
+- mqtt-paho library
+- python 3
+
+
+## published topics
+
+
+![](images/topics_illustration.png)
+
+
+## Authentication notes
+
 launch the command to renew the token :
 
  curl -d @content http://mafreebox.freebox.fr/api/v4/login/authorize/ > result_auth
