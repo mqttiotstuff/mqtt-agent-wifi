@@ -65,7 +65,10 @@ f = freebox.FbxApp(app_id,app_token)
 
 cnx_reconnect = 100
 
+print("Current API Version :" + str(f.version()));
+
 while True:
+    # get freebox version
     time.sleep(1)
     try:
     # reconnect if needed
@@ -73,10 +76,19 @@ while True:
         if cnx_reconnect < 0:
             f = freebox.FbxApp(app_id,app_token)
             cnx_reconnect = 100
+        # list ap
+
+        apresponse = f.com("wifi/ap/")
+        assert "result" in apresponse
+        idlist = list(map(lambda x:x['id'],apresponse['result'])) 
 
     # query the box
-        for i in ['0','1']: 
-            response = f.com("wifi/ap/" + i + "/stations") 
+        for i in idlist: 
+            # for each access point
+            response = f.com("wifi/ap/" + str(i) + "/stations/") 
+            if not 'result' in response:
+                print("no result in response, wifi api returned " + str(response))
+                continue
             ap = response['result']
 
             result = map(lambda x:(x['mac'],x['hostname'],x["signal"],x["rx_bytes"],x["tx_bytes"]), ap)

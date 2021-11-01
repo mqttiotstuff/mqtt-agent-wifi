@@ -21,8 +21,9 @@ class FbxCnx:
             time.sleep(1)
         return s=="granted" and token
 
-    def _com(self,method,data=None,headers={}):
-        url = "http://"+self.host+"/api/v3/"+method
+    def _httpcall(self,rooturl,data=None,headers={}):
+        assert rooturl.startswith('/')
+        url = "http://"+self.host + rooturl
         if data: 
             data = json.dumps(data)
             data = bytearray(data.encode('utf-8'))
@@ -33,6 +34,10 @@ class FbxCnx:
             content = result.read()
             content = content.decode()
             return json.loads(content)
+
+
+    def _com(self,freeboxmethod,data=None,headers={}):
+        return self._httpcall("/api/v8/"+freeboxmethod, data, headers)
 
     def _mksession(self):
         challenge=self._com("login/")["result"]["challenge"]
@@ -49,6 +54,11 @@ class FbxApp(FbxCnx):
         FbxCnx.__init__(self,host)
         self.appid,self.token=appid,token
         self.session=session if session else self._mksession()
+    def version(self):
+        response = self._httpcall("/api_version")
+        if 'api_version' in response:
+            return response['api_version']
+        raise Exception("cannot read the api version information, api_version is no longer in payload")
 
     def com(self,method,data=None):
         return self._com(method,data,{"X-Fbx-App-Auth": self.session})

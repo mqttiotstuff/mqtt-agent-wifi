@@ -20,7 +20,7 @@ app_token = str(j["result"]["app_token"]) # freebox don't like unicode
 
 f = freebox.FbxApp(app_id,app_token)
 
-print f.dir()
+print (f.dir())
 
 def listActualConnectedDevices():
     # list connected devices

@@ -72,11 +72,26 @@ app_token = str(j["result"]["app_token"]) # freebox don't like unicode
 f = freebox.FbxApp(app_id,app_token)
 
 def listActualConnectedDevices():
-   # list connected devices
-   ap = f.com("wifi/ap/0/stations")['result']
-   # extract the mac / name
-   couplelist = map(lambda x:(x['mac'],x['hostname']), ap)
-   return toHash(couplelist)
+
+   apresponse = f.com("wifi/ap/")
+   assert "result" in apresponse
+   idlist = list(map(lambda x:x['id'],apresponse['result'])) 
+   result = []
+   for apid in idlist:
+      # list connected devices
+      stationsresponse = f.com("wifi/ap/" + str(apid) + "/stations/")
+      if not 'result' in stationsresponse:
+         print("no result in response : " + str(stationsresponse))
+         continue
+      ap = stationsresponse['result']
+      print("station result :" + str(ap))
+      # extract the mac / name
+      couplelist = map(lambda x:(x['mac'],x['hostname']), ap)
+      print("extracted mac, hostname couple") 
+      print(result)
+      result.extend(couplelist)
+
+   return toHash(result)
 
 def toHash(l):
    h = {}
@@ -90,7 +105,7 @@ lastActivated = None
 def sendWithAlias(m,host, state):
    if m in aliases:
       host = aliases[m]
-   client2.publish(PRESENCE + "/" + host, str(state), qos=1)
+   client2.publish(PRESENCE + "/" + host, str(state), qos=1, retain=True)
 
 reconnect = 100
 
@@ -103,7 +118,8 @@ while True:
           reconnect = 100
        old = lastActivated
        lastActivated = listActualConnectedDevices()
-       if old != None:
+       print("actuel elements :" + str(lastActivated))
+       if old is not None:
           # compare the new and missing
           for k in lastActivated:
              if not (k in old):
