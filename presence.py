@@ -22,6 +22,7 @@ config = configparser.RawConfigParser()
 
 
 PRESENCE = "home/agents/presence"
+NET_CONNECT = "home/agents/netconnect"
 
 
 #############################################################
@@ -93,6 +94,18 @@ def listActualConnectedDevices():
 
    return toHash(result)
 
+def listDHCPHosts():
+   response = f.com("dhcp/static_lease/")
+   assert "result" in response
+   idliststatic = list(map(lambda x:(x['mac'],x['ip']),response['result'])) 
+
+   response = f.com("dhcp/dynamic_lease/")
+   assert "result" in response
+   idlistdyn = list(map(lambda x:(x['mac'],x['ip']),response['result'])) 
+   l = idliststatic + idlistdyn
+   return toHash(l)
+
+
 def toHash(l):
    h = {}
    if not l is None:
@@ -116,6 +129,12 @@ while True:
        if reconnect < 0:
           f = freebox.FbxApp(app_id,app_token) 
           reconnect = 100
+
+       connected = listDHCPHosts()
+       for k in connected:
+           client2.publish(NET_CONNECT + "/" + connected[k], str(k), qos=1, retain=True)
+
+
        old = lastActivated
        lastActivated = listActualConnectedDevices()
        print("actuel elements :" + str(lastActivated))
