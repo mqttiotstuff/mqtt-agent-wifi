@@ -134,6 +134,11 @@ while True:
        for k in connected:
            client2.publish(NET_CONNECT + "/" + connected[k], str(k), qos=1, retain=True)
 
+       for k in connected:
+           p = k
+           if k in aliases:
+               p = aliases[k]
+           client2.publish(NET_CONNECT + "_aliases" + "/" + connected[k], str(p), qos=1, retain=True)
 
        old = lastActivated
        lastActivated = listActualConnectedDevices()
